@@ -1,4 +1,4 @@
-package com.gilbertohdz.media3.audio
+package com.gilbertohdz.media3.audio.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

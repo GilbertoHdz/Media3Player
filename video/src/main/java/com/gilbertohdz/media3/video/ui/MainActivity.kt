@@ -1,4 +1,4 @@
-package com.gilbertohdz.media3.video
+package com.gilbertohdz.media3.video.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
