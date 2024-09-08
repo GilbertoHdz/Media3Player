@@ -1,4 +1,4 @@
-package com.gilbertohdz.media3.video.ui.utils
+package com.gilbertohdz.media3.video.utils
 
 import java.util.concurrent.TimeUnit
 

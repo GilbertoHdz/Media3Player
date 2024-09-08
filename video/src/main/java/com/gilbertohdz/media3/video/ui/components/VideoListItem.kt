@@ -34,7 +34,7 @@ import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.model.Video
 import com.gilbertohdz.media3.video.model.VideoList
 import com.gilbertohdz.media3.video.ui.theme.Media3PlayerTheme
-import com.gilbertohdz.media3.video.ui.utils.toFormattedDuration
+import com.gilbertohdz.media3.video.utils.toFormattedDuration
 
 
 @Composable
