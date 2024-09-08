@@ -39,7 +39,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.ui.theme.Media3PlayerTheme
-import com.gilbertohdz.media3.video.ui.utils.toFormattedDuration
+import com.gilbertohdz.media3.video.utils.toFormattedDuration
 import java.util.concurrent.TimeUnit
 
 @Composable

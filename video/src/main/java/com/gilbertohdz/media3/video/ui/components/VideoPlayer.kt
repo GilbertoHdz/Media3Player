@@ -38,7 +38,7 @@ import androidx.media3.common.Player
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.ui.player.PlayerScreenState
 import com.gilbertohdz.media3.video.ui.theme.Media3PlayerTheme
-import com.gilbertohdz.media3.video.ui.utils.DummyPlayer
+import com.gilbertohdz.media3.video.utils.DummyPlayer
 import kotlinx.coroutines.delay
 
 @Composable
