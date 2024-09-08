@@ -20,7 +20,7 @@ import com.gilbertohdz.media3.audio.R
 import com.gilbertohdz.media3.audio.model.Song
 import com.gilbertohdz.media3.audio.model.SongList
 import com.gilbertohdz.media3.audio.ui.theme.Media3PlayerTheme
-import com.gilbertohdz.media3.audio.ui.utils.toFormattedDuration
+import com.gilbertohdz.media3.audio.utils.toFormattedDuration
 import java.util.concurrent.TimeUnit
 
 @Composable
