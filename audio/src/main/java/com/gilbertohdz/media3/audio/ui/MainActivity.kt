@@ -54,6 +54,8 @@ class MainActivity : ComponentActivity() {
 
         mediaSession = MediaSession.Builder(this, player)
             .build()
+
+        viewmodel.setupPlayer(player)
     }
 
     override fun onStart() {

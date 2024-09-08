@@ -25,7 +25,6 @@ import com.gilbertohdz.media3.audio.model.Song
 import com.gilbertohdz.media3.audio.model.SongList
 import com.gilbertohdz.media3.audio.ui.theme.Media3PlayerTheme
 
-
 @Composable
 fun NowPlaying(song: Song, error: Exception? = null) {
     NowPlaying(
@@ -35,7 +34,6 @@ fun NowPlaying(song: Song, error: Exception? = null) {
         error = error,
     )
 }
-
 
 @Composable
 fun NowPlaying(image: String, title: String, artist: String, error: Exception?) {

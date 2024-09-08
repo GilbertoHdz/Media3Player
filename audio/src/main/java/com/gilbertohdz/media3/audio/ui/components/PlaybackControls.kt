@@ -1,6 +1,5 @@
 package com.gilbertohdz.media3.audio.ui.components
 
-
 import androidx.compose.animation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -16,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
 import com.gilbertohdz.media3.audio.R
 import com.gilbertohdz.media3.audio.model.Song
 import com.gilbertohdz.media3.audio.model.SongList
@@ -29,6 +29,8 @@ fun PlaybackControls(
     isPlaying: Boolean,
     modifier: Modifier = Modifier,
     isBuffering: Boolean = false,
+    repeatMode: Int = 0,
+    shuffleModeEnabled: Boolean = false,
     currentProgress: Long = 0L,
     bufferedProgress: Long = 0L,
     error: Exception? = null,
@@ -36,6 +38,8 @@ fun PlaybackControls(
     onPlayPause: () -> Unit = {},
     onSkipPrevious: () -> Unit = {},
     onSkipNext: () -> Unit = {},
+    onRepeat: () -> Unit = {},
+    onShuffle: () -> Unit = {},
 ) {
     Card(
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
@@ -63,9 +67,13 @@ fun PlaybackControls(
             Spacer(modifier = Modifier.height(8.dp))
             TransportControlButtons(
                 isPlaying = isPlaying,
+                repeatMode = repeatMode,
+                shuffleModeEnabled = shuffleModeEnabled,
                 onPlayPause = onPlayPause,
                 onSkipPrevious = onSkipPrevious,
                 onSkipNext = onSkipNext,
+                onRepeat = onRepeat,
+                onShuffle = onShuffle,
             )
         }
     }
@@ -108,7 +116,7 @@ private fun PlayerSlider(
             onValueChangeFinished = { onSeek(sliderState) },
             modifier = Modifier.fillMaxWidth(),
             colors = SliderDefaults.colors(),
-            track = { sliderPositions ->
+            track = {
                 Box {
                     val bufferedSeconds = (TimeUnit.MILLISECONDS.toSeconds(
                         bufferedProgress
@@ -116,12 +124,12 @@ private fun PlayerSlider(
                     SliderDefaults.Track(
                         colors = SliderDefaults.colors(),
                         enabled = false,
-                        sliderPositions = SliderPositions(0f..bufferedSeconds),
+                        sliderState = SliderState(bufferedSeconds),
                     )
                     SliderDefaults.Track(
                         colors = SliderDefaults.colors(inactiveTrackColor = Color.Transparent),
                         enabled = true,
-                        sliderState = sliderPositions
+                        sliderState = it,
                     )
                 }
             }
@@ -144,15 +152,36 @@ private fun PlayerSlider(
 @Composable
 private fun TransportControlButtons(
     isPlaying: Boolean,
+    repeatMode: Int,
+    shuffleModeEnabled: Boolean,
     onPlayPause: () -> Unit,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
+    onRepeat: () -> Unit,
+    onShuffle: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Button(
+            onClick = onRepeat,
+            modifier = Modifier.size(36.dp),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            val repeatIcon = when (repeatMode) {
+                Player.REPEAT_MODE_ALL -> R.drawable.icon_repeat
+                Player.REPEAT_MODE_ONE -> R.drawable.icon_repeat_one
+                else -> R.drawable.icon_repeat_off
+            }
+            Icon(
+                painter = painterResource(id = repeatIcon),
+                contentDescription = stringResource(
+                    id = R.string.repeat_mode_action_text
+                ),
+            )
+        }
         Button(
             onClick = onSkipPrevious,
             modifier = Modifier.size(48.dp),
@@ -191,6 +220,22 @@ private fun TransportControlButtons(
                 painter = painterResource(id = R.drawable.icon_skip_next),
                 contentDescription = stringResource(
                     id = R.string.skip_next_action_text
+                ),
+            )
+        }
+        Button(
+            onClick = onShuffle,
+            modifier = Modifier.size(36.dp),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            val shuffleIcon = when (shuffleModeEnabled) {
+                true -> R.drawable.icon_shuffle
+                else -> R.drawable.icon_shuffle_off
+            }
+            Icon(
+                painter = painterResource(id = shuffleIcon),
+                contentDescription = stringResource(
+                    id = R.string.shuffle_action_text
                 ),
             )
         }
