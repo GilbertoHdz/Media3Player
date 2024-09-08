@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit
 fun PlayerControls(
     isPlaying: Boolean,
     isLoading: Boolean,
+    currentSpeed: Int,
     currentPosition: Long,
     bufferedPosition: Long,
     durationSeconds: Int?,
@@ -56,6 +57,7 @@ fun PlayerControls(
         modifier = modifier,
         isPlaying = isPlaying,
         isLoading = isLoading,
+        currentSpeed = currentSpeed,
         onPlayPause = controlsListener::onPlayPause,
         currentPosition = currentPosition,
         bufferedPosition = bufferedPosition,
@@ -65,6 +67,7 @@ fun PlayerControls(
         onSkipNext = controlsListener::onSkipNext,
         onSkipPrevious = controlsListener::onSkipPrevious,
         onSeek = controlsListener::onSeek,
+        onSpeedChange = controlsListener::onSpeedChange
     )
 }
 
@@ -72,6 +75,7 @@ fun PlayerControls(
 private fun PlayerControls(
     isPlaying: Boolean,
     isLoading: Boolean,
+    currentSpeed: Int,
     currentPosition: Long,
     bufferedPosition: Long,
     durationSeconds: Int?,
@@ -82,6 +86,7 @@ private fun PlayerControls(
     onSkipNext: () -> Unit = {},
     onSkipPrevious: () -> Unit = {},
     onSeek: (seconds: Float) -> Unit = {},
+    onSpeedChange: () -> Unit = {},
 ) {
     val verticalGradient = Brush.verticalGradient(
         colorStops = arrayOf(
@@ -93,7 +98,7 @@ private fun PlayerControls(
     ConstraintLayout(
         modifier = modifier.background(verticalGradient)
     ) {
-        val (midControls, slider, startText, endText) = createRefs()
+        val (midControls, slider, startText, endText, speedIcon) = createRefs()
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
@@ -203,6 +208,26 @@ private fun PlayerControls(
                     bottom.linkTo(slider.bottom)
                 },
         )
+        Row(
+            modifier = Modifier
+                .constrainAs(speedIcon) {
+                    end.linkTo(parent.end, margin = 8.dp)
+                    top.linkTo(parent.top, margin = 8.dp)
+                }
+                .clip(CircleShape)
+                .clickable(onClick = onSpeedChange),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("${currentSpeed}x")
+            Icon(
+                painter = painterResource(id = R.drawable.icon_speed),
+                contentDescription = stringResource(
+                    id = R.string.playback_speed_action
+                ),
+                modifier = Modifier.size(30.dp),
+                tint = Color.White,
+            )
+        }
         PlayerSlider(
             modifier = Modifier.constrainAs(slider) {
                 width = Dimension.fillToConstraints
@@ -271,6 +296,7 @@ fun PlayerControlsPreview() {
             PlayerControls(
                 isPlaying = false,
                 isLoading = false,
+                currentSpeed = 1,
                 currentPosition = 5_000L,
                 bufferedPosition = 50_000L,
                 durationSeconds = 50,
