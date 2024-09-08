@@ -14,7 +14,11 @@
             android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:configChanges="orientation|screenSize|smallestScreenSize"
             android:theme="@style/Theme.Media3Player">
+            <!-- android:configChanges="orientation|screenSize|smallestScreenSize"-->
+            <!-- prevent playback stopped when is rotate with smallestScreenSize -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
