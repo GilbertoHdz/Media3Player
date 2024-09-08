@@ -14,6 +14,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -24,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter.Configuration
 import androidx.media3.session.SessionToken
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.model.VideoList
@@ -40,10 +42,10 @@ fun PlayerScreen(player: Player, sessionToken: SessionToken, modifier: Modifier 
     DisposableEffect(key1 = sessionToken, key2 = context, key3 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP) {
-                // TODO: Pause player
+                player.pause()
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
+        lifecycleOwner.lifecycle.addObserver(observer) // Main Activity
         model.onStart(context, sessionToken)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -57,22 +59,27 @@ fun PlayerScreen(player: Player, sessionToken: SessionToken, modifier: Modifier 
 
 @Composable
 private fun PlayerScreen(player: Player, screenState: PlayerScreenState, modifier: Modifier = Modifier) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = modifier.fillMaxSize()) {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                fontSize = 32.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(8.dp),
-            )
-            VideoPlayer(player = player, screenState = screenState)
-            Playlist(
-                videos = screenState.playlist,
-                onVideoClick = screenState.controlsListener::onVideoClick,
-                modifier = Modifier.fillMaxHeight(),
-            )
+    // Handle Orientation to fullscreen without Title Toolbar
+    if (LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+        VideoPlayer(player = player, screenState = screenState)
+    } else {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = modifier.fillMaxSize()) {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    fontSize = 32.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(8.dp),
+                )
+                VideoPlayer(player = player, screenState = screenState)
+                Playlist(
+                    videos = screenState.playlist,
+                    onVideoClick = screenState.controlsListener::onVideoClick,
+                    modifier = Modifier.fillMaxHeight(),
+                )
+            }
         }
     }
 }
