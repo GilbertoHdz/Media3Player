@@ -1,9 +1,12 @@
 package com.gilbertohdz.media3.video.ui.components
 
+import android.content.SharedPreferences
 import androidx.compose.runtime.Immutable
+import androidx.core.content.edit
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import com.gilbertohdz.media3.video.model.Video
+import com.gilbertohdz.media3.video.ui.player.PlayerScreenViewModel.Companion.PLAYBACK_SPEED_PREFERENCE
 import java.util.concurrent.TimeUnit
 
 interface ControlsListener {
@@ -14,11 +17,15 @@ interface ControlsListener {
     fun onForward() {}
     fun onRewind() {}
     fun onVideoClick(video: Video) {}
+    fun onSpeedChange() {}
 }
 
 
 @Immutable
-class PlayerControlsListener(private val player: Player) : ControlsListener {
+class PlayerControlsListener(
+    private val player: Player,
+    private val playbackPreferences: SharedPreferences
+) : ControlsListener {
     override fun onPlayPause() {
         if (player.isPlaying) {
             player.pause()
@@ -72,4 +79,13 @@ class PlayerControlsListener(private val player: Player) : ControlsListener {
         player.play()
     }
 
+    override fun onSpeedChange() {
+        when (player.playbackParameters.speed) {
+            1f -> player.setPlaybackSpeed(2f)
+            2f -> player.setPlaybackSpeed(1f)
+        }
+        playbackPreferences.edit {
+            putFloat(PLAYBACK_SPEED_PREFERENCE, player.playbackParameters.speed)
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.gilbertohdz.media3.video.ui.player
 import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -11,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -35,6 +37,9 @@ class PlayerScreenViewModel(
             else -> null
         }
 
+    private val playbackPreferences: SharedPreferences = getApplication<Application>()
+        .getSharedPreferences(PLAYBACK_PREFERENCES, Context.MODE_PRIVATE)
+
     private val _playerScreenState = MutableStateFlow(PlayerScreenState())
     val playerScreenState: StateFlow<PlayerScreenState> = _playerScreenState
 
@@ -55,6 +60,7 @@ class PlayerScreenViewModel(
             val mediaItems = loadVideos()
             player.setMediaItems(mediaItems)
         }
+        player.setPlaybackSpeed(playbackPreferences.getFloat(PLAYBACK_SPEED_PREFERENCE, 1F))
         setInitialPlayerScreenState(player)
         setupProgressUpdateJob(player)
         if (player.playbackState == Player.STATE_IDLE) {
@@ -112,6 +118,12 @@ class PlayerScreenViewModel(
                     }
                 }
             }
+
+            override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+                updatePlayerScreenState {
+                    copy(currentSpeed = playbackParameters.speed.toInt())
+                }
+            }
         })
     }
 
@@ -145,7 +157,7 @@ class PlayerScreenViewModel(
                 playlist = VideoList,
                 currentVideo = VideoList.find { it.id.toString() == player.currentMediaItem?.mediaId },
                 bufferedPosition = player.bufferedPosition,
-                controlsListener = PlayerControlsListener(player)
+                controlsListener = PlayerControlsListener(player, playbackPreferences)
             )
         }
     }
@@ -160,13 +172,17 @@ class PlayerScreenViewModel(
                         bufferedPosition = player.bufferedPosition,
                     )
                 }
-                delay(1000)
+                delay(1000 / player.playbackParameters.speed.toLong())
             }
         }
     }
 
-
     private fun updatePlayerScreenState(block: PlayerScreenState.() -> PlayerScreenState) {
         _playerScreenState.value = block(_playerScreenState.value)
+    }
+
+    companion object {
+        const val PLAYBACK_PREFERENCES = "playback_preferences"
+        const val PLAYBACK_SPEED_PREFERENCE = "playback_speed_preference"
     }
 }
