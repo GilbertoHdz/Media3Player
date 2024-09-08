@@ -1,5 +1,6 @@
 package com.gilbertohdz.media3.video.ui.components
 
+import android.view.SurfaceView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.Player
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.ui.player.PlayerScreenState
@@ -79,12 +81,13 @@ private fun VideoPlayer(
             .fillMaxWidth()
             .height(maxWidth * 9 / 16f)
 
-        // TODO: Replace with video player
-        Spacer(
+        AndroidView(
             modifier = modifier
-                .background(Color.Green)
-                .then(clickModifier)
-        )
+                .then(clickModifier),
+            factory = ::SurfaceView
+        ) { surfaceView ->
+            player?.setVideoSurfaceView(surfaceView)
+        }
 
         Crossfade(targetState = error, label = "ControlsOrErrorCrossfade") { error ->
             if (error != null) {
