@@ -1,5 +1,6 @@
 package com.gilbertohdz.media3.video.ui.components
 
+import android.content.Context
 import android.view.SurfaceView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +41,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.Player
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.ui.player.PlayerScreenState
+import com.gilbertohdz.media3.video.ui.player.PlayerScreenViewModel.Companion.PLAYBACK_PREFERENCES
 import com.gilbertohdz.media3.video.ui.theme.Media3PlayerTheme
 import com.gilbertohdz.media3.video.utils.DummyPlayer
 import kotlinx.coroutines.delay
@@ -49,6 +52,7 @@ fun VideoPlayer(player: Player, screenState: PlayerScreenState) {
         player = player,
         isPlaying = screenState.isPlaying,
         isLoading = screenState.isBuffering,
+        currentSpeed = screenState.currentSpeed,
         currentPosition = screenState.currentPosition,
         bufferedPosition = screenState.bufferedPosition,
         durationSeconds = screenState.currentVideo?.durationSeconds,
@@ -61,6 +65,7 @@ private fun VideoPlayer(
     player: Player?,
     isPlaying: Boolean,
     isLoading: Boolean,
+    currentSpeed: Int,
     currentPosition: Long,
     bufferedPosition: Long,
     durationSeconds: Int?,
@@ -112,6 +117,7 @@ private fun VideoPlayer(
                         currentPosition = currentPosition,
                         bufferedPosition = bufferedPosition,
                         durationSeconds = durationSeconds,
+                        currentSpeed = currentSpeed,
                         controlsListener = controlsListener,
                     )
                 }
@@ -179,14 +185,17 @@ fun VideoPlayerPreview() {
     Media3PlayerTheme {
         Surface {
             val player = DummyPlayer()
+            val playbackPreferences =
+                LocalContext.current.getSharedPreferences(PLAYBACK_PREFERENCES, Context.MODE_PRIVATE)
             VideoPlayer(
                 player = player,
                 isPlaying = false,
                 isLoading = false,
+                currentSpeed = 1,
                 currentPosition = 5_000L,
                 bufferedPosition = 50_000L,
                 durationSeconds = 100,
-                controlsListener = PlayerControlsListener(player)
+                controlsListener = PlayerControlsListener(player, playbackPreferences)
             )
         }
     }
