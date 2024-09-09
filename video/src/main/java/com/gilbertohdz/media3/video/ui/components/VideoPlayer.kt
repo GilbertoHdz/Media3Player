@@ -1,9 +1,12 @@
 package com.gilbertohdz.media3.video.ui.components
 
 import android.content.Context
+import android.content.res.Configuration
 import android.view.SurfaceView
+import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,12 +43,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import com.gilbertohdz.media3.video.R
 import com.gilbertohdz.media3.video.ui.player.PlayerScreenState
 import com.gilbertohdz.media3.video.ui.player.PlayerScreenViewModel.Companion.PLAYBACK_PREFERENCES
 import com.gilbertohdz.media3.video.ui.theme.Media3PlayerTheme
 import com.gilbertohdz.media3.video.utils.DummyPlayer
 import kotlinx.coroutines.delay
+import kotlin.math.min
 
 @Composable
 fun VideoPlayer(player: Player, screenState: PlayerScreenState) {
@@ -56,7 +62,9 @@ fun VideoPlayer(player: Player, screenState: PlayerScreenState) {
         currentPosition = screenState.currentPosition,
         bufferedPosition = screenState.bufferedPosition,
         durationSeconds = screenState.currentVideo?.durationSeconds,
+        aspectRatio = screenState.videoAspectRatio,
         controlsListener = screenState.controlsListener,
+        error = screenState.error,
     )
 }
 
@@ -69,6 +77,7 @@ private fun VideoPlayer(
     currentPosition: Long,
     bufferedPosition: Long,
     durationSeconds: Int?,
+    aspectRatio: Float = 16 / 9f, // Standard Widescreen
     controlsListener: ControlsListener,
     error: Exception? = null,
 ) {
@@ -81,15 +90,30 @@ private fun VideoPlayer(
     ) {
         showControls = !showControls
     }
-    BoxWithConstraints(contentAlignment = Alignment.Center) {
+
+    BoxWithConstraints(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black)
+            .then(clickModifier)
+    ) {
+        val heightDp = when {
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE -> maxHeight
+            aspectRatio < 1 -> (maxWidth / aspectRatio) * 0.7f
+            else -> maxWidth / min(aspectRatio, 21 / 9f) // Cinematic Widescreen
+        }
         val modifier = Modifier
             .fillMaxWidth()
-            .height(maxWidth * 9 / 16f)
+            .animateContentSize()
+            .height(heightDp)
 
         AndroidView(
-            modifier = modifier
-                .then(clickModifier),
-            factory = ::SurfaceView
+            factory = ::SurfaceView,
+            modifier = Modifier
+                .animateContentSize()
+                .size(heightDp * aspectRatio, heightDp)
+                .then(clickModifier)
         ) { surfaceView ->
             player?.setVideoSurfaceView(surfaceView)
         }
@@ -179,6 +203,7 @@ private fun ErrorButtons(
     }
 }
 
+@OptIn(UnstableApi::class)
 @Preview
 @Composable
 fun VideoPlayerPreview() {

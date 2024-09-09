@@ -18,7 +18,9 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.Size
+import androidx.media3.common.util.UnstableApi
 
+@UnstableApi
 class DummyPlayer : Player {
     override fun getApplicationLooper(): Looper {
         TODO("Not yet implemented")
@@ -525,6 +527,10 @@ class DummyPlayer : Player {
     }
 
     override fun setDeviceMuted(muted: Boolean, flags: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setAudioAttributes(audioAttributes: AudioAttributes, handleAudioFocus: Boolean) {
         TODO("Not yet implemented")
     }
 }
