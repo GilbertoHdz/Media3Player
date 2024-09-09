@@ -14,6 +14,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.gilbertohdz.media3.video.model.VideoList
@@ -122,6 +123,14 @@ class PlayerScreenViewModel(
             override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
                 updatePlayerScreenState {
                     copy(currentSpeed = playbackParameters.speed.toInt())
+                }
+            }
+
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                if (videoSize.height > 0) {
+                    updatePlayerScreenState {
+                        copy(videoAspectRatio = videoSize.width / videoSize.height.toFloat())
+                    }
                 }
             }
         })

@@ -12,5 +12,6 @@ data class PlayerScreenState(
     val currentSpeed: Int = 1,
     val playlist: List<Video> = emptyList(),
     val controlsListener: ControlsListener = object : ControlsListener {},
+    val videoAspectRatio: Float = 16 / 9f,
     val error: Exception? = null,
 )
